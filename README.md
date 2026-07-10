@@ -1,10 +1,12 @@
 # ship-kit-migrate
 
+[![tests](https://github.com/authlayerdev/ship-kit-migrate/actions/workflows/test.yml/badge.svg)](https://github.com/authlayerdev/ship-kit-migrate/actions/workflows/test.yml)
+
 Deterministic, fixture-tested [jscodeshift](https://github.com/facebook/jscodeshift) codemods that do the **mechanical** part of migrating a Next.js app from **NextAuth** or **Clerk** to [Better Auth](https://www.better-auth.com).
 
 > **Independent & unofficial.** This tool and Ship Kit are independent projects and are **not** affiliated with, sponsored by, or endorsed by the Better Auth project. "Better Auth" is a separate open-source library.
 
-**Free and MIT-licensed.** These are the same migration codemods that ship with [Ship Kit](https://betterauth.app) — a paid Better Auth starter for Next.js (disclosure: I make and sell it). They're open-sourced so you can use them, read them, and trust them whether or not you ever buy anything.
+**Free and MIT-licensed.** These are the same migration codemods that ship with [Ship Kit](https://betterauth.app/?utm_source=github&utm_medium=ship-kit-migrate) — a paid Better Auth starter for Next.js (disclosure: I make and sell it). They're open-sourced so you can use them, read them, and trust them whether or not you ever buy anything.
 
 ## What this is (and isn't)
 
@@ -43,7 +45,7 @@ Each transform ships with its own fixture corpus.
 
 ## What it does NOT do (the manual remainder)
 
-The codemods cover the mechanical part. You still do, by hand: the auth config body (providers, the database adapter, callbacks → hooks), the `signIn`/`signOut` **argument** shapes, the database schema + the **user-data migration** (password hashes don't carry over — plan a reset), the API route move, the `.env` file edits, and middleware → a server-side `requireSession`. Step-by-step guides for each live at [betterauth.app](https://betterauth.app).
+The codemods cover the mechanical part. You still do, by hand: the auth config body (providers, the database adapter, callbacks → hooks), the `signIn`/`signOut` **argument** shapes, the database schema + the **user-data migration** (password hashes don't carry over — plan a reset), the API route move, the `.env` file edits, and middleware → a server-side `requireSession`. Step-by-step guides for each live at [betterauth.app](https://betterauth.app/?utm_source=github&utm_medium=ship-kit-migrate).
 
 ## Tests
 
@@ -63,4 +65,4 @@ Best-effort. This is a free tool maintained by a solo developer alongside Ship K
 
 ## License
 
-[MIT](./LICENSE). Built as part of [Ship Kit](https://betterauth.app), a production-ready Better Auth starter for Next.js (organizations, org-level billing, an admin panel — and these codemods), sold separately. The codemods here are free; the kit is the paid, wired-and-tested destination they migrate you toward.
+[MIT](./LICENSE). Built as part of [Ship Kit](https://betterauth.app/?utm_source=github&utm_medium=ship-kit-migrate), a production-ready Better Auth starter for Next.js (organizations, org-level billing, an admin panel — and these codemods), sold separately. The codemods here are free; the kit is the paid, wired-and-tested destination they migrate you toward.
