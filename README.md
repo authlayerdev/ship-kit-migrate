@@ -45,7 +45,7 @@ Each transform ships with its own fixture corpus.
 
 ## What it does NOT do (the manual remainder)
 
-The codemods cover the mechanical part. You still do, by hand: the auth config body (providers, the database adapter, callbacks → hooks), the `signIn`/`signOut` **argument** shapes, the database schema + the **user-data migration** (password hashes don't carry over — plan a reset), the API route move, the `.env` file edits, and middleware → a server-side `requireSession`. Step-by-step guides for each live at [betterauth.app](https://betterauth.app/?utm_source=github&utm_medium=ship-kit-migrate).
+The codemods cover the mechanical part. You still do, by hand: the auth config body (providers, the database adapter, callbacks → hooks), the `signIn`/`signOut` **argument** shapes, the database schema + the **user-data migration** (password hashes carry over if Better Auth is configured to verify the same hashing scheme, e.g. bcrypt for a Clerk export; otherwise plan a reset), the API route move, the `.env` file edits, and middleware → a server-side `requireSession`. Step-by-step guides for each live at [betterauth.app](https://betterauth.app/?utm_source=github&utm_medium=ship-kit-migrate).
 
 ## Tests
 
