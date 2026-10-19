@@ -17,4 +17,5 @@ jobs:
       # `npm ci` installs exactly what package-lock.json pins (reproducible, and it
       # sidesteps the npm 10.8 arborist "edgesOut" crash seen with `npm install`).
       - run: npm ci
+      - run: npm run typecheck
       - run: npm test

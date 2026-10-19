@@ -7,7 +7,15 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["node"]
+    "types": [
+      "node"
+    ]
   },
-  "include": ["migrate"]
+  "include": [
+    "migrate"
+  ],
+  "exclude": [
+    "node_modules",
+    "migrate/transforms/__testfixtures__"
+  ]
 }

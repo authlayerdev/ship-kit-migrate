@@ -9,7 +9,8 @@
   "files": ["migrate", "README.md", "LICENSE"],
   "scripts": {
     "migrate": "node ./migrate/cli.mjs",
-    "test": "vitest run migrate/"
+    "test": "vitest run migrate/",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [
     "better-auth",
