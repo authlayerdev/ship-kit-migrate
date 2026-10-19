@@ -10,6 +10,9 @@ Deterministic, fixture-tested [jscodeshift](https://github.com/facebook/jscodesh
 
 ## What this is (and isn't)
 
+The full migration guide — what each codemod does, what it deliberately does not do, and the manual remainder (`// TODO(ship-kit):` by `// TODO(ship-kit):`) — is in [MIGRATION.md](./MIGRATION.md).
+
+
 - **Deterministic** — the same input always produces the same output. **No AI/LLM** anywhere in the path.
 - **Honest about its limits** — when a transform can't safely rewrite something, it leaves a visible `// TODO(ship-kit):` comment instead of guessing. It handles the **boring, high-volume** edits (imports, env-var names, session call-sites); the judgement calls (provider config, callbacks, the data migration) stay yours. It is an **assist, not a one-click migrator**.
 

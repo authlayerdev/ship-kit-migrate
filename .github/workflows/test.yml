@@ -12,6 +12,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-      - run: npm install
+          node-version: 22
+          cache: npm
+      # `npm ci` installs exactly what package-lock.json pins (reproducible, and it
+      # sidesteps the npm 10.8 arborist "edgesOut" crash seen with `npm install`).
+      - run: npm ci
       - run: npm test
