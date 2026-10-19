@@ -10,7 +10,7 @@
  *
  * Behaviour:
  *   - <path> may be a single file or a directory (walked recursively).
- *   - --dry prints a unified-ish summary diff and writes nothing.
+ *   - --dry prints an aligned line diff (with context) and writes nothing.
  *   - Without --dry, changed files are rewritten in place; unchanged files are
  *     left untouched. Exit code is 0 on success, 1 on a usage/IO error.
  */
@@ -25,7 +25,16 @@ import { join, extname, relative } from "node:path";
 import { applyTransform } from "./runner";
 import { getTransform, transformNames, TRANSFORMS } from "./registry";
 
-const DEFAULT_EXTENSIONS = ["ts", "tsx", "js", "jsx", "mts", "cts", "mjs", "cjs"];
+const DEFAULT_EXTENSIONS = [
+  "ts",
+  "tsx",
+  "js",
+  "jsx",
+  "mts",
+  "cts",
+  "mjs",
+  "cjs",
+];
 const SKIP_DIRS = new Set([
   "node_modules",
   ".git",
@@ -95,7 +104,9 @@ function parseArgs(argv: string[]): ParsedArgs {
 class UsageError extends Error {}
 
 function helpText(): string {
-  const rows = TRANSFORMS.map((t) => `    ${t.name.padEnd(12)} ${t.summary}`).join("\n");
+  const rows = TRANSFORMS.map(
+    (t) => `    ${t.name.padEnd(12)} ${t.summary}`,
+  ).join("\n");
   return `ship-kit-migrate — assisted Better Auth migration codemods
 
 USAGE
@@ -148,19 +159,85 @@ function collectFiles(target: string, extensions: Set<string>): string[] {
   return files;
 }
 
-/** Tiny line-level diff for --dry output (no dependency, good enough to review). */
-function lineDiff(before: string, after: string): string {
+/** Lines of unchanged context shown around each change in --dry output. */
+const DIFF_CONTEXT = 2;
+/** Above this many LCS cells (lines × lines) we skip alignment and show a block replace. */
+const DIFF_MAX_CELLS = 4_000_000;
+
+/**
+ * Line-level diff for --dry output (no dependency).
+ *
+ * Aligns the two versions with a longest-common-subsequence table, so an
+ * inserted line (e.g. a new `import`) shows up as one `+` line instead of
+ * shifting every following line into a bogus -/+ pair. Changes are grouped into
+ * hunks with `DIFF_CONTEXT` unchanged lines around them; hunks are separated by
+ * `  …`. Unchanged input returns "". Exported for tests.
+ */
+export function lineDiff(before: string, after: string): string {
+  if (before === after) return "";
   const a = before.split("\n");
   const b = after.split("\n");
-  const max = Math.max(a.length, b.length);
-  const lines: string[] = [];
-  for (let i = 0; i < max; i++) {
-    if (a[i] !== b[i]) {
-      if (a[i] !== undefined) lines.push(`  - ${a[i]}`);
-      if (b[i] !== undefined) lines.push(`  + ${b[i]}`);
+  const n = a.length;
+  const m = b.length;
+
+  type Op = { kind: " " | "-" | "+"; text: string };
+  const ops: Op[] = [];
+
+  if (n * m > DIFF_MAX_CELLS) {
+    for (const text of a) ops.push({ kind: "-", text });
+    for (const text of b) ops.push({ kind: "+", text });
+  } else {
+    // lcs[i][j] = LCS length of a[i..] and b[j..], stored row-major.
+    const w = m + 1;
+    const lcs = new Uint32Array((n + 1) * w);
+    const at = (i: number, j: number): number => lcs[i * w + j] ?? 0;
+    for (let i = n - 1; i >= 0; i--) {
+      for (let j = m - 1; j >= 0; j--) {
+        lcs[i * w + j] =
+          a[i] === b[j]
+            ? at(i + 1, j + 1) + 1
+            : Math.max(at(i + 1, j), at(i, j + 1));
+      }
     }
+    let i = 0;
+    let j = 0;
+    while (i < n && j < m) {
+      const left = a[i] ?? "";
+      const right = b[j] ?? "";
+      if (left === right) {
+        ops.push({ kind: " ", text: left });
+        i++;
+        j++;
+      } else if (at(i + 1, j) >= at(i, j + 1)) {
+        ops.push({ kind: "-", text: left });
+        i++;
+      } else {
+        ops.push({ kind: "+", text: right });
+        j++;
+      }
+    }
+    for (; i < n; i++) ops.push({ kind: "-", text: a[i] ?? "" });
+    for (; j < m; j++) ops.push({ kind: "+", text: b[j] ?? "" });
   }
-  return lines.join("\n");
+
+  // Keep only changed lines plus DIFF_CONTEXT lines of context around them.
+  const keep = new Array<boolean>(ops.length).fill(false);
+  ops.forEach((op, idx) => {
+    if (op.kind === " ") return;
+    const from = Math.max(0, idx - DIFF_CONTEXT);
+    const to = Math.min(ops.length - 1, idx + DIFF_CONTEXT);
+    for (let k = from; k <= to; k++) keep[k] = true;
+  });
+
+  const out: string[] = [];
+  let last = -1;
+  ops.forEach((op, idx) => {
+    if (!keep[idx]) return;
+    if (last !== -1 && idx > last + 1) out.push("  …");
+    out.push(`  ${op.kind} ${op.text}`.replace(/\s+$/, ""));
+    last = idx;
+  });
+  return out.join("\n");
 }
 
 export function main(argv: string[]): number {
@@ -175,7 +252,7 @@ export function main(argv: string[]): number {
     throw err;
   }
 
-  if (args.help || (argv.length === 0)) {
+  if (args.help || argv.length === 0) {
     process.stdout.write(helpText());
     return args.help ? 0 : 1;
   }
@@ -196,7 +273,9 @@ export function main(argv: string[]): number {
   }
 
   if (args.paths.length === 0) {
-    process.stderr.write("No <path> given. Pass a file or directory to transform.\n");
+    process.stderr.write(
+      "No <path> given. Pass a file or directory to transform.\n",
+    );
     return 1;
   }
 
