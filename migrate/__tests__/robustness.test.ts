@@ -176,33 +176,34 @@ describe("codemod robustness — malformed input fails loudly", () => {
 
 // ── Idempotency on a few more representative shapes ────────────────────────────
 describe("codemod robustness — twice == once (idempotency)", () => {
-  const cases: ReadonlyArray<readonly [string, "nextauth" | "clerk", string]> = [
+  const cases: ReadonlyArray<readonly [string, "nextauth" | "clerk", string]> =
     [
-      "nextauth env-var rewrite",
-      "nextauth",
-      `const s = process.env.NEXTAUTH_SECRET;\nconst u = process.env.NEXTAUTH_URL;\n`,
-    ],
-    [
-      "nextauth client useSession",
-      "nextauth",
-      `"use client";\nimport { useSession } from "next-auth/react";\nexport function C() { const s = useSession(); return s; }\n`,
-    ],
-    [
-      "clerk components (TODO-flagged JSX)",
-      "clerk",
-      `import { UserButton, SignedIn } from "@clerk/nextjs";\nexport function Nav() { return <SignedIn><UserButton /></SignedIn>; }\n`,
-    ],
-    [
-      "clerk middleware",
-      "clerk",
-      `import { clerkMiddleware } from "@clerk/nextjs/server";\nexport default clerkMiddleware();\n`,
-    ],
-    [
-      "clerk currentUser server",
-      "clerk",
-      `import { currentUser } from "@clerk/nextjs/server";\nexport async function f() { const u = await currentUser(); return u; }\n`,
-    ],
-  ];
+      [
+        "nextauth env-var rewrite",
+        "nextauth",
+        `const s = process.env.NEXTAUTH_SECRET;\nconst u = process.env.NEXTAUTH_URL;\n`,
+      ],
+      [
+        "nextauth client useSession",
+        "nextauth",
+        `"use client";\nimport { useSession } from "next-auth/react";\nexport function C() { const s = useSession(); return s; }\n`,
+      ],
+      [
+        "clerk components (TODO-flagged JSX)",
+        "clerk",
+        `import { UserButton, SignedIn } from "@clerk/nextjs";\nexport function Nav() { return <SignedIn><UserButton /></SignedIn>; }\n`,
+      ],
+      [
+        "clerk middleware",
+        "clerk",
+        `import { clerkMiddleware } from "@clerk/nextjs/server";\nexport default clerkMiddleware();\n`,
+      ],
+      [
+        "clerk currentUser server",
+        "clerk",
+        `import { currentUser } from "@clerk/nextjs/server";\nexport async function f() { const u = await currentUser(); return u; }\n`,
+      ],
+    ];
 
   for (const [label, name, src] of cases) {
     it(`${name}: ${label} is idempotent`, () => {

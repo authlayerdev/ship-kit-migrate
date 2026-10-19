@@ -59,11 +59,11 @@ migrate/
 
 ## Available transforms
 
-| Name       | What it does                                                                  |
-| ---------- | ---------------------------------------------------------------------------- |
-| `nextauth` | NextAuth (next-auth) → Better Auth: imports, session call-sites, env vars, config-scaffold TODOs. Full guide: [`MIGRATION.md`](../MIGRATION.md). |
+| Name       | What it does                                                                                                                                                                                        |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nextauth` | NextAuth (next-auth) → Better Auth: imports, session call-sites, env vars, config-scaffold TODOs. Full guide: [`MIGRATION.md`](../MIGRATION.md).                                                    |
 | `clerk`    | Clerk (@clerk/nextjs) → Better Auth: imports, `auth()`/`currentUser()`/`useUser()`/`useAuth()` call-sites, env vars, and component/middleware TODOs. Full guide: [`MIGRATION.md`](../MIGRATION.md). |
-| `identity` | No-op round-trip (proves the harness/CLI; useful for smoke tests)              |
+| `identity` | No-op round-trip (proves the harness/CLI; useful for smoke tests)                                                                                                                                   |
 
 Each transform ships with its own fixture corpus and a section in the top-level
 migration guide. The Clerk transform deliberately does **less** automatically and

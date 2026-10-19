@@ -39,7 +39,10 @@ import { ENV_LOOKUP } from "./lib/nextauth-env";
 const KIT_AUTH_MODULE = "@/lib/auth";
 const KIT_AUTH_CLIENT_MODULE = "@/lib/auth-client";
 
-export default function transform(file: FileInfo, api: API): string | undefined {
+export default function transform(
+  file: FileInfo,
+  api: API,
+): string | undefined {
   const j = api.jscodeshift;
   const root = j(file.source);
 
@@ -229,9 +232,7 @@ function buildGetSessionCall(j: API["jscodeshift"]): CallExpression {
         j.property(
           "init",
           j.identifier("headers"),
-          j.awaitExpression(
-            j.callExpression(j.identifier("headers"), []),
-          ),
+          j.awaitExpression(j.callExpression(j.identifier("headers"), [])),
         ),
       ]),
     ],
@@ -244,7 +245,10 @@ function findEnclosingStatement(path: ASTPath): ASTPath | null {
   while (current) {
     const type = current.node.type;
     if (typeof type === "string" && type.endsWith("Statement")) return current;
-    if (type === "ExportNamedDeclaration" || type === "ExportDefaultDeclaration") {
+    if (
+      type === "ExportNamedDeclaration" ||
+      type === "ExportDefaultDeclaration"
+    ) {
       return current;
     }
     current = current.parent;
@@ -402,7 +406,10 @@ function addNeededImports(
       ),
     );
   }
-  if (need.authClient && !hasImport(j, root, KIT_AUTH_CLIENT_MODULE, "authClient")) {
+  if (
+    need.authClient &&
+    !hasImport(j, root, KIT_AUTH_CLIENT_MODULE, "authClient")
+  ) {
     toAdd.push(
       j.importDeclaration(
         [j.importSpecifier(j.identifier("authClient"))],

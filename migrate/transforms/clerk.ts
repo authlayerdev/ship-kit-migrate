@@ -95,7 +95,10 @@ const COMPONENT_GUIDANCE: Record<string, string> = {
     "<Protect> has no drop-in replacement — gate with the kit's server-side guards (requireSession / requireOrgPermission) instead of a component.",
 };
 
-export default function transform(file: FileInfo, api: API): string | undefined {
+export default function transform(
+  file: FileInfo,
+  api: API,
+): string | undefined {
   const j = api.jscodeshift;
   const root = j(file.source);
 
@@ -112,9 +115,13 @@ export default function transform(file: FileInfo, api: API): string | undefined 
   // Which Clerk symbols are actually imported in THIS file. We only rewrite a
   // call-site if its name was imported from a `@clerk/*` module, so an unrelated
   // local `auth()` (very plausible name) is never touched by mistake.
-  const importedServerFns = collectClerkImports(j, root, [...SERVER_SESSION_FNS]);
+  const importedServerFns = collectClerkImports(j, root, [
+    ...SERVER_SESSION_FNS,
+  ]);
   const importedClientHooks = collectClerkImports(j, root, [...CLIENT_HOOKS]);
-  const importedMiddlewareFns = collectClerkImports(j, root, [...MIDDLEWARE_FNS]);
+  const importedMiddlewareFns = collectClerkImports(j, root, [
+    ...MIDDLEWARE_FNS,
+  ]);
 
   // ── 1. Rewrite env-var member accesses (process.env.CLERK_* etc.) ────────────
   root
@@ -184,19 +191,17 @@ export default function transform(file: FileInfo, api: API): string | undefined 
   // ── 4. Components — annotate every Clerk component usage with a TODO ──────────
   // The JSX is left intact (so the file still parses); the buyer replaces it with
   // the kit's auth UI. We annotate the nearest statement of each usage.
-  root
-    .find(j.JSXElement)
-    .forEach((p) => {
-      const name = jsxElementName(p.node);
-      if (!name) return;
-      const guidance = COMPONENT_GUIDANCE[name];
-      if (!guidance) return;
-      const stmt = findEnclosingStatement(p);
-      if (stmt) {
-        attachTodo(j, stmt, guidance);
-        changed = true;
-      }
-    });
+  root.find(j.JSXElement).forEach((p) => {
+    const name = jsxElementName(p.node);
+    if (!name) return;
+    const guidance = COMPONENT_GUIDANCE[name];
+    if (!guidance) return;
+    const stmt = findEnclosingStatement(p);
+    if (stmt) {
+      attachTodo(j, stmt, guidance);
+      changed = true;
+    }
+  });
 
   // ── 5. Middleware — clerkMiddleware()/authMiddleware() → src/proxy.ts TODO ───
   for (const fnName of importedMiddlewareFns) {
@@ -352,7 +357,9 @@ function rewriteImports(
       // (now-undefined) JSX usages below have a clear breadcrumb at the top.
       const componentNames = (decl.specifiers ?? [])
         .filter((s) => s.type === "ImportSpecifier")
-        .map((s) => identifierName((s as { imported: { type: string } }).imported))
+        .map((s) =>
+          identifierName((s as { imported: { type: string } }).imported),
+        )
         .filter((n): n is string => !!n && n in COMPONENT_GUIDANCE);
 
       if (componentNames.length > 0) {
@@ -396,7 +403,10 @@ function addNeededImports(
       ),
     );
   }
-  if (need.authClient && !hasImport(j, root, KIT_AUTH_CLIENT_MODULE, "authClient")) {
+  if (
+    need.authClient &&
+    !hasImport(j, root, KIT_AUTH_CLIENT_MODULE, "authClient")
+  ) {
     toAdd.push(
       j.importDeclaration(
         [j.importSpecifier(j.identifier("authClient"))],

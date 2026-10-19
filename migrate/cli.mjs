@@ -42,6 +42,8 @@ const child = spawn(
 
 child.on("exit", (code) => process.exit(code ?? 0));
 child.on("error", (err) => {
-  process.stderr.write(`Failed to start the migration runner: ${err.message}\n`);
+  process.stderr.write(
+    `Failed to start the migration runner: ${err.message}\n`,
+  );
   process.exit(1);
 });

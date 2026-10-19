@@ -26,7 +26,8 @@ export const TRANSFORMS: readonly TransformEntry[] = [
   },
   {
     name: "identity",
-    summary: "No-op round-trip transform (proves the harness/CLI; useful for smoke tests)",
+    summary:
+      "No-op round-trip transform (proves the harness/CLI; useful for smoke tests)",
     transform: identity,
   },
 ];

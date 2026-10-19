@@ -56,9 +56,7 @@ describe("nextauth transform", () => {
     // see robustness.test.ts), so the input imports `next-auth`.
     const src = `import NextAuth from "next-auth";\nexport const authOptions = { providers: [] };\nexport default NextAuth(authOptions);\n`;
     const { source } = run(src);
-    const todoLines = source
-      .split("\n")
-      .filter((l) => l.includes("TODO"));
+    const todoLines = source.split("\n").filter((l) => l.includes("TODO"));
     expect(todoLines.length).toBeGreaterThan(0);
     for (const line of todoLines) {
       expect(line).toContain(TODO_PREFIX);
