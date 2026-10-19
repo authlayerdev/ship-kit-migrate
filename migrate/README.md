@@ -6,7 +6,7 @@ AI migrator**: every transform is a boring, idempotent, fixture-tested
 [jscodeshift](https://github.com/facebook/jscodeshift) codemod that either makes
 a change it is sure about, or leaves a clearly-marked `// TODO(ship-kit):`
 comment for you to resolve by hand. Whatever a codemod can't safely transform is
-documented as a manual step — see [`MIGRATION.md`](https://betterauth.app).
+documented as a manual step — see [`MIGRATION.md`](../MIGRATION.md).
 
 > These scripts run on **your** source code. They are shipped as a bonus on top
 > of Ship Kit; the kit itself is a complete, working Better Auth app you can use
@@ -44,8 +44,8 @@ migrate/
   types.ts                # shared transform types + forced TSX parser
   transforms/
     identity.ts           # no-op transform; proves the harness/CLI end-to-end
-    nextauth.ts           # NextAuth → Better Auth (see https://betterauth.app)
-    clerk.ts              # Clerk → Better Auth (see https://betterauth.app)
+    nextauth.ts           # NextAuth → Better Auth (see ../MIGRATION.md)
+    clerk.ts              # Clerk → Better Auth (see ../MIGRATION.md)
     lib/                  # transform helpers (TODO markers, env mapping)
     __testfixtures__/
       identity/*.input.ts + *.output.ts
@@ -61,8 +61,8 @@ migrate/
 
 | Name       | What it does                                                                  |
 | ---------- | ---------------------------------------------------------------------------- |
-| `nextauth` | NextAuth (next-auth) → Better Auth: imports, session call-sites, env vars, config-scaffold TODOs. Full guide: [`MIGRATION.md`](https://betterauth.app). |
-| `clerk`    | Clerk (@clerk/nextjs) → Better Auth: imports, `auth()`/`currentUser()`/`useUser()`/`useAuth()` call-sites, env vars, and component/middleware TODOs. Full guide: [`MIGRATION.md`](https://betterauth.app). |
+| `nextauth` | NextAuth (next-auth) → Better Auth: imports, session call-sites, env vars, config-scaffold TODOs. Full guide: [`MIGRATION.md`](../MIGRATION.md). |
+| `clerk`    | Clerk (@clerk/nextjs) → Better Auth: imports, `auth()`/`currentUser()`/`useUser()`/`useAuth()` call-sites, env vars, and component/middleware TODOs. Full guide: [`MIGRATION.md`](../MIGRATION.md). |
 | `identity` | No-op round-trip (proves the harness/CLI; useful for smoke tests)              |
 
 Each transform ships with its own fixture corpus and a section in the top-level
